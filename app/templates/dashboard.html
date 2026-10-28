@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b12">
+  <title>DARK STREAM · لوحة التحكم</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-body" data-default-rights="{{ rights_default }}" data-max-streams="{{ max_streams }}" data-max-hls="{{ max_hls_jobs }}">
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="/dashboard" class="brand-link"><div class="brand-mark"><span class="brand-symbol">▶</span></div><div><strong>DARK <span>STREAM</span></strong><small>CONTROL CENTER</small></div></a>
+      <div class="sidebar-label">القائمة الرئيسية</div>
+      <nav class="side-nav" aria-label="القائمة الرئيسية">
+        <a class="nav-item active" href="#overview"><span class="nav-icon">▦</span> نظرة عامة</a>
+        <a class="nav-item" href="#solo"><span class="nav-icon">◉</span> بث منفرد</a>
+        <a class="nav-item" href="#group"><span class="nav-icon">▤</span> بث جماعي</a>
+        <a class="nav-item" href="#hls"><span class="nav-icon">↗</span> روابط HLS</a>
+        <a class="nav-item" href="#check"><span class="nav-icon">⌕</span> فحص الرابط</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="server-mini"><div class="server-mini-top"><span class="status-dot"></span> حالة السيرفر <span id="serverText" class="server-ok">متصل</span></div><p>FFmpeg <b id="ffmpegStatus">جارٍ الفحص</b></p><p>FFprobe <b id="ffprobeStatus">جارٍ الفحص</b></p></div>
+        <button id="logoutButton" class="button ghost full">تسجيل الخروج <span>↪</span></button>
+        <small class="sidebar-version">DARK STREAM WEB · v1.0</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow">STREAM MANAGEMENT</div><h1>لوحة <span>التحكم</span></h1><p class="muted">إدارة بثوث Facebook Live ومصادر HLS من مكان واحد.</p></div>
+        <div class="topbar-meta"><span class="live-pill"><span class="status-dot"></span> النظام جاهز</span><div class="topbar-clock" id="clock">—</div></div>
+      </header>
+
+      <section id="overview" class="stats-grid">
+        <article class="stat-card"><div class="stat-icon red">▶</div><div><span class="stat-label">بثوث مباشرة</span><div class="stat-value" id="streamCount">0</div><span class="stat-foot">Facebook Live</span></div></article>
+        <article class="stat-card"><div class="stat-icon purple">↗</div><div><span class="stat-label">روابط HLS</span><div class="stat-value" id="hlsCount">0</div><span class="stat-foot">قوائم تشغيل نشطة</span></div></article>
+        <article class="stat-card"><div class="stat-icon green">✓</div><div><span class="stat-label">FFmpeg</span><div class="stat-value small-value" id="ffmpegValue">—</div><span class="stat-foot">محرك البث</span></div></article>
+        <article class="stat-card"><div class="stat-icon amber">⌁</div><div><span class="stat-label">حد البثوث</span><div class="stat-value" id="streamLimit">{{ max_streams }}</div><span class="stat-foot">حسب إعدادات السيرفر</span></div></article>
+      </section>
+
+      <section id="solo" class="content-grid">
+        <article class="panel panel-main">
+          <div class="panel-heading"><div><div class="eyebrow">FACEBOOK LIVE</div><h2><span class="heading-icon">▶</span> تشغيل بث منفرد</h2><p class="muted">أدخل رابط المصدر ومفتاح بث Facebook.</p></div><span class="step-badge">01</span></div>
+          <form id="soloForm" class="form-grid">
+            <div class="field"><label for="soloName">اسم البث</label><input id="soloName" required maxlength="80" placeholder="مثال: مباراة اليوم"></div>
+            <div class="field"><label for="soloKey">مفتاح بث Facebook</label><input id="soloKey" required maxlength="512" autocomplete="off" placeholder="أدخل Stream Key"></div>
+            <div class="field field-full"><label for="soloUrl">رابط المصدر <span class="required-star">*</span></label><input id="soloUrl" required type="url" maxlength="8192" placeholder="https://example.com/live.m3u8" dir="ltr"></div>
+            <div class="field"><label for="soloMode">طريقة التشغيل</label><select id="soloMode"><option value="copy">⚡ Copy · أقل استهلاك</option><option value="compatible">H.264/AAC · توافق</option><option value="low">اقتصادي جدًا · 360p</option><option value="quality">متوازن · حتى 720p</option></select><small class="field-hint">إضافة الحقوق تتطلب إعادة الترميز.</small></div>
+            <div class="field"><label for="rightsText">نص الحقوق</label><input id="rightsText" maxlength="60" value="{{ rights_default }}" placeholder="YOUSSEF"><label class="check-line"><input id="addRights" type="checkbox"><span>إظهار الحقوق أسفل الفيديو</span></label></div>
+            <div class="field-full form-actions"><button class="button primary" type="submit" id="soloSubmit"><span>▶</span> تشغيل البث</button><span class="form-note">ستتم تجربة قراءة المصدر قبل التشغيل.</span></div>
+          </form>
+        </article>
+        <aside class="panel info-panel"><div class="info-orbit"><span>▶</span></div><div class="eyebrow">STREAM GUIDE</div><h3>اختر الوضع المناسب</h3><div class="mode-guide"><div><b>Copy</b><span>لا يعيد ترميز الفيديو؛ غالبًا أقل استهلاكًا للمعالج.</span></div><div><b>اقتصادي</b><span>مناسب للخوادم الضعيفة، بدقة مستهدفة 360p.</span></div><div><b>مع الحقوق</b><span>يرسم النص داخل الفيديو ويحتاج إلى CPU إضافي.</span></div></div><div class="info-notice">تأكد من امتلاك صلاحية بث المصدر ومفتاح Facebook Live.</div></aside>
+      </section>
+
+      <section id="group" class="panel section-panel">
+        <div class="panel-heading"><div><div class="eyebrow">MULTI STREAM</div><h2><span class="heading-icon purple-text">▤</span> تشغيل بث جماعي <span class="count-chip">حتى 20 مصدرًا</span></h2><p class="muted">يمكنك تشغيل عدة بثوث مع اختيار طريقة واحدة للمجموعة.</p></div><span class="step-badge">02</span></div>
+        <form id="groupForm">
+          <div id="groupRows" class="group-rows"></div>
+          <div class="group-controls"><button class="button secondary" type="button" id="addGroupRow">＋ إضافة بث</button><div class="group-mode"><label for="groupMode">طريقة التشغيل للمجموعة</label><select id="groupMode"><option value="copy">Copy · أقل استهلاك</option><option value="compatible">H.264/AAC · توافق</option><option value="low">اقتصادي · 360p</option><option value="quality">متوازن · 720p</option></select></div><button class="button primary" type="submit" id="groupSubmit">تشغيل المجموعة <span>↗</span></button></div>
+        </form>
+      </section>
+
+      <section class="panel section-panel" id="activeSection">
+        <div class="panel-heading"><div><div class="eyebrow">LIVE MONITOR</div><h2><span class="heading-icon green-text">◉</span> البثوث الحالية</h2><p class="muted">الحالة، مدة التشغيل، المحاولات، والسجلات.</p></div><div class="heading-actions"><button class="button danger-outline" id="stopAllButton">إيقاف الكل</button><button class="button icon-button" id="refreshButton" title="تحديث">↻</button></div></div>
+        <div id="streamsList" class="stream-list"><div class="empty-state"><span>◌</span><b>لا توجد بثوث حاليًا</b><p>سيظهر أي بث تبدأه في هذه القائمة.</p></div></div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel" id="hls">
+          <div class="panel-heading"><div><div class="eyebrow">HLS GENERATOR</div><h2><span class="heading-icon purple-text">↗</span> إنشاء رابط HLS</h2><p class="muted">حوّل المصدر إلى ملف m3u8 قابل للمشاهدة.</p></div><span class="step-badge">03</span></div>
+          <form id="hlsForm" class="form-grid">
+            <div class="field field-full"><label for="hlsUrl">رابط المصدر</label><input id="hlsUrl" type="url" maxlength="8192" dir="ltr" placeholder="https://example.com/live.m3u8"></div>
+            <div class="field field-full"><label for="hlsTxtFile">أو ارفع ملف TXT يحتوي على رابط المصدر</label><input id="hlsTxtFile" type="file" accept=".txt,text/plain"><small class="field-hint">سيُقرأ أول سطر غير فارغ لا يبدأ بعلامة # من الملف.</small></div>
+            <div class="field field-full"><label for="hlsRightsText">نص الحقوق</label><input id="hlsRightsText" maxlength="60" value="{{ rights_default }}"><label class="check-line"><input id="hlsAddRights" type="checkbox"><span>إضافة الحقوق داخل الفيديو</span></label></div>
+            <div class="field-full"><button class="button secondary full" type="submit" id="hlsSubmit">إنشاء رابط HLS <span>↗</span></button></div>
+          </form>
+          <div id="hlsList" class="hls-list"><div class="empty-inline">لا توجد روابط HLS نشطة.</div></div>
+        </article>
+        <article class="panel" id="check">
+          <div class="panel-heading"><div><div class="eyebrow">SOURCE DIAGNOSTICS</div><h2><span class="heading-icon amber-text">⌕</span> فحص الرابط</h2><p class="muted">اختبر المصدر عبر FFprobe قبل بدء البث.</p></div><span class="step-badge">04</span></div>
+          <form id="checkForm" class="form-stack"><div class="field"><label for="checkUrl">رابط المصدر</label><input id="checkUrl" type="url" required maxlength="8192" dir="ltr" placeholder="https://example.com/video.m3u8"></div><button class="button secondary full" type="submit" id="checkSubmit">⌕ فحص المصدر</button></form>
+          <div id="checkResult" class="check-result" hidden></div>
+        </article>
+      </section>
+      <footer class="footer"><span>DARK STREAM WEB</span><span>استضافة دائمة مطلوبة لتشغيل FFmpeg أثناء إغلاق المتصفح.</span></footer>
+    </main>
+  </div>
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <div id="modal" class="modal" hidden><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">السجلات</h3><button class="icon-button" id="closeModal" aria-label="إغلاق">×</button></div><pre id="modalBody" class="log-view"></pre></div></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
