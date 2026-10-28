@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b12">
+  <title>DARK STREAM · تسجيل الدخول</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-body">
+  <div class="login-glow glow-one"></div><div class="login-glow glow-two"></div>
+  <main class="login-shell">
+    <div class="brand-mark large-mark"><span class="brand-symbol">▶</span></div>
+    <div class="eyebrow">LIVE CONTROL CENTER</div>
+    <h1>DARK <span>STREAM</span></h1>
+    <p class="muted login-subtitle">لوحة تحكم البث المباشر</p>
+    <form id="loginForm" class="login-card">
+      <label for="username">اسم المستخدم</label>
+      <input id="username" name="username" autocomplete="username" placeholder="اسم المستخدم" required maxlength="128">
+      <label for="password">كلمة المرور</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••••••" required maxlength="512">
+      <div id="loginError" class="form-error" hidden></div>
+      <button class="button primary full" id="loginButton" type="submit"><span>دخول إلى لوحة التحكم</span><span aria-hidden="true">←</span></button>
+    </form>
+    <p class="login-foot"><span class="status-dot"></span> اتصال محمي · للمسؤول فقط</p>
+  </main>
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorBox = document.getElementById('loginError');
+    const button = document.getElementById('loginButton');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); errorBox.hidden = true; button.disabled = true;
+      try {
+        const response = await fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:form.username.value, password:form.password.value})});
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'تعذر تسجيل الدخول.');
+        location.href = data.redirect || '/dashboard';
+      } catch (error) { errorBox.textContent = error.message || 'تعذر الاتصال بالسيرفر.'; errorBox.hidden = false; }
+      finally { button.disabled = false; }
+    });
+  </script>
+</body>
+</html>
